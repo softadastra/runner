@@ -1,15 +1,34 @@
-#include <vix/tests/tests.hpp>
+/**
+ *
+ *  @file test_basic.cpp
+ *  @author Gaspard Kirira
+ *
+ *  Softadastra Runner - Basic Test
+ *
+ */
+
+#include <iostream>
+
+#include <softadastra/runner/core/CommandRequest.hpp>
+#include <softadastra/runner/core/RunnerService.hpp>
+#include <softadastra/runner/infrastructure/VixProcessExecutor.hpp>
 
 int main()
 {
-  using namespace vix::tests;
+  using namespace softadastra::runner;
 
-  auto &registry = TestRegistry::instance();
-  registry.clear();
+  auto executor = std::make_shared<infrastructure::VixProcessExecutor>();
+  core::RunnerService service(executor);
 
-  registry.add(TestCase("app basic test", [] {
-    Assert::equal(2 + 2, 4);
-  }));
+  core::CommandRequest request;
+  request.program = "echo";
+  request.arguments = {"hello", "from", "runner"};
 
-  return TestRunner::run_all_and_exit();
+  auto result = service.run(request);
+
+  std::cout << "exit code: " << result.exit_code << '\n';
+  std::cout << "stdout: " << result.stdout_text << '\n';
+  std::cout << "stderr: " << result.stderr_text << '\n';
+
+  return result.success() ? 0 : 1;
 }

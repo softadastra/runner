@@ -1,116 +1,164 @@
-# runner
+# Softadastra Runner
 
-Minimal Vix.cpp application.
+Simple command runner built with Vix.cpp.
 
-## Quick start
+Softadastra Runner is a small console application from Softadastra that executes system commands through `vix::process`.
+
+It is designed to stay simple, readable, and extensible.
+
+## What it does
+
+Softadastra Runner lets you:
+
+- read a command from the terminal
+- parse the program name and arguments
+- execute the command with `vix::process`
+- capture `stdout`
+- capture `stderr`
+- display the final exit code
+
+## Why this project exists
+
+Softadastra Runner is a practical example of how to build a clean console application on top of Vix.cpp.
+
+It shows how to structure a small CLI project with:
+
+- clear separation of responsibilities
+- a small core layer
+- an infrastructure layer built on Vix
+- a simple interactive loop
+
+## Project structure
+
+```text
+runner/
+├── CMakeLists.txt
+├── LICENSE
+├── README.md
+├── .gitignore
+├── include/
+│   └── softadastra/
+│       └── runner/
+│           ├── app/
+│           │   └── RunnerApp.hpp
+│           ├── cli/
+│           │   ├── Console.hpp
+│           │   ├── InputParser.hpp
+│           │   └── Prompt.hpp
+│           ├── core/
+│           │   ├── CommandRequest.hpp
+│           │   ├── CommandResult.hpp
+│           │   └── RunnerService.hpp
+│           ├── infrastructure/
+│           │   └── VixProcessExecutor.hpp
+│           └── utils/
+│               └── StringUtils.hpp
+├── src/
+│   ├── main.cpp
+│   ├── app/
+│   │   └── RunnerApp.cpp
+│   ├── cli/
+│   │   ├── Console.cpp
+│   │   ├── InputParser.cpp
+│   │   └── Prompt.cpp
+│   ├── core/
+│   │   └── RunnerService.cpp
+│   ├── infrastructure/
+│   │   └── VixProcessExecutor.cpp
+│   └── utils/
+│       └── StringUtils.cpp
+├── tests/
+│   ├── test_basic.cpp
+│   └── test_cli.cpp
+└── examples/
+    └── demo.txt
+```
+
+## Design
+
+Softadastra Runner uses a simple layered design:
+
+| Layer | Responsibility |
+|-------|---------------|
+| `app` | application orchestration |
+| `cli` | prompt, input, and output |
+| `core` | command request, result, and service logic |
+| `infrastructure` | execution through `vix::process` |
+| `utils` | small reusable helpers |
+
+This keeps `main()` minimal and makes the code easier to extend later.
+
+## Requirements
+
+- C++20
+- CMake 3.20+
+- Vix.cpp installed and available through CMake
+
+## Build
 
 ```bash
-cd runner
-cp .env.example .env
 vix build
+```
+
+## Run
+
+```bash
 vix run
 ```
 
-Then open:
+## Example
 
 ```
-http://localhost:8080
+> echo hello
+hello
+[exit code: 0]
+
+> pwd
+/home/user/runner
+[exit code: 0]
+
+> ls
+build-ninja
+include
+src
+tests
+[exit code: 0]
+
+> exit
 ```
 
-## Dependencies
+## Notes
 
-This project uses a `vix.json` manifest.
-
-Workflow:
-
-- `vix add <pkg>` → add dependency
-- `vix install` → install dependencies
-- `vix.lock` → ensures reproducible builds
+- The first token is treated as the program name.
+- The remaining tokens are treated as arguments.
+- Runner does not implement full shell parsing.
+- Runner does not interpret pipes, redirects, or shell operators by itself.
+- If you type a command that does not exist, execution fails with an error from the process layer.
 
 Example:
 
-```bash
-vix add gk/json@^1.0.0
-vix install
+```
+> hi
+exec failed: No such file or directory
+[exit code: 1]
 ```
 
-## Tasks
+## Tests
 
-Run project tasks:
-
-```bash
-vix task <name>
-```
-
-Common tasks:
+Build the project, then run tests with CTest:
 
 ```bash
-vix task dev
-vix task test
-vix task ci
+ctest --test-dir build-ninja --output-on-failure
 ```
 
-Edit `vix.json` to customize tasks and pipelines.
+## Purpose
 
-## Configuration
+Runner is intentionally small. It is meant to be:
 
-Vix uses `.env` files for configuration.
+- a learning project
+- a clean Vix.cpp example
+- a base for future Softadastra console tools
 
-Start by copying the example:
+## License
 
-```bash
-cp .env.example .env
-```
-
-Example:
-
-```env
-SERVER_PORT=8080
-DATABASE_ENGINE=mysql
-DATABASE_DEFAULT_HOST=127.0.0.1
-DATABASE_DEFAULT_PORT=3306
-DATABASE_DEFAULT_USER=root
-DATABASE_DEFAULT_PASSWORD=
-DATABASE_DEFAULT_NAME=appdb
-LOGGING_ASYNC=true
-WAF_MODE=basic
-```
-
-## Using configuration in code
-
-```cpp
-#include <vix.hpp>
-using namespace vix;
-
-int main()
-{
-  config::Config cfg{".env"};
-
-  App app;
-  app.get("/", [](Request&, Response& res) {
-    res.send("Hello world");
-  });
-
-  app.run(cfg.getServerPort());
-}
-```
-
-## Environment mapping
-
-Vix maps config keys to environment variables:
-
-- `server.port` → `SERVER_PORT`
-- `database.default.host` → `DATABASE_DEFAULT_HOST`
-- `database.default.name` → `DATABASE_DEFAULT_NAME`
-
-This keeps the C++ API clean and environment-driven.
-
-## Environment layers
-
-You can use multiple env files:
-
-- `.env`
-- `.env.local`
-- `.env.production`
-
-Use `.env` for development and environment-specific files for deployment.
+MIT

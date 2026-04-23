@@ -1,0 +1,29 @@
+Softadastra Runner Demo
+
+Start the application:
+vix run
+
+Example session:
+
+> echo hello
+hello
+[exit code: 0]
+
+> pwd
+/path/to/runner
+[exit code: 0]
+
+> ls
+CMakeLists.txt
+include
+src
+tests
+[exit code: 0]
+
+> exit
+
+Notes:
+- The first token is treated as the program name.
+- The remaining tokens are passed as arguments.
+- Runner executes commands using Vix process.
+- Type exit to quit the application.
