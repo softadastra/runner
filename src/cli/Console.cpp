@@ -14,6 +14,7 @@
  *
  */
 
+#include <vix/input.hpp>
 #include <vix/print.hpp>
 #include <softadastra/runner/cli/Console.hpp>
 
@@ -22,9 +23,7 @@ namespace softadastra::runner::cli
 
   std::string Console::read_line() const
   {
-    std::string line;
-    std::getline(std::cin, line);
-    return line;
+    return vix::input();
   }
 
   void Console::write(const std::string &message) const
